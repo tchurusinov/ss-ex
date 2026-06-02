@@ -62,7 +62,10 @@
 #   postgres_db_data:
 
 # docker-compose.yml
-version: '3.8'
+# version: '3.8'
+
+
+
 services:
   airflow-webserver:
     image: apache/airflow:latest
