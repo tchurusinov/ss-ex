@@ -1,0 +1,141 @@
+# docker-compose.yml
+# version: '3.8'
+# services:
+#   airflow-webserver:
+#     image: apache/airflow:3.7.0
+#     environment:
+#       - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+#       - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+#       - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+#       - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+#       - AIRFLOW__CORE__LOAD_EXAMPLES=false
+#       - AIRFLOW__CORE__ENABLE_XCOM_PICKLING=true
+#     volumes:
+#       - ./dags:/opt/airflow/dags
+#       - ./data:/opt/airflow/data
+#       - ./logs:/opt/airflow/logs
+#     ports:
+#       - "8383:8080"
+#     depends_on:
+#       - postgres
+#     user: "${UID:-0}:${GID:-0}"
+#     command: webserver
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:8383/health"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+
+#   airflow-scheduler:
+#     image: apache/airflow:3.7.0
+#     environment:
+#       - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+#       - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+#       - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+#       - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+#       - AIRFLOW__CORE__LOAD_EXAMPLES=false
+#       - AIRFLOW__CORE__ENABLE_XCOM_PICKLING=true
+#     volumes:
+#       - ./dags:/opt/airflow/dags
+#       - ./data:/opt/airflow/data
+#       - ./logs:/opt/airflow/logs
+#     depends_on:
+#       - postgres
+#     user: "${UID:-0}:${GID:-0}"
+#     command: scheduler
+
+#   postgres:
+#     image: postgres:13
+#     environment:
+#       - POSTGRES_USER=airflow
+#       - POSTGRES_PASSWORD=airflow
+#       - POSTGRES_DB=airflow
+#     volumes:
+#       - postgres_db_data:/var/lib/postgresql/data
+#     healthcheck:
+#       test: ["CMD", "pg_isready", "-U", "airflow", "-d", "airflow"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+
+# volumes:
+#   postgres_db_data:
+
+# docker-compose.yml
+version: '3.8'
+services:
+  airflow-webserver:
+    image: apache/airflow:latest
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__CORE__ENABLE_XCOM_PICKLING=true
+      - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    ports:
+      - "8383:8080"
+    depends_on:
+      - postgres
+    user: "${UID:-0}:${GID:-0}"
+    command: webserver
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8383/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  airflow-scheduler:
+    image: apache/airflow:latest
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__CORE__ENABLE_XCOM_PICKLING=true
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./data:/opt/airflow/data
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    depends_on:
+      - postgres
+    user: "${UID:-0}:${GID:-0}"
+    command: scheduler
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    volumes:
+      - postgres_db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow", "-d", "airflow"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+    ports:
+      - "4566:4566"
+    restart: unless-stopped
+
+volumes:
+  postgres_db_data:
