@@ -1,10 +1,12 @@
 # todo
 
-- [ ] build
+- [x] build
     - [x] infra
-    - [ ] dag
+    - [x] dag
 - [ ] run
+    - [ ] check if works as supposed
 - [ ] documentation
+    - [ ] readme
 - [ ] unit tests
 
 
