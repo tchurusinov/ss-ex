@@ -3,17 +3,19 @@ x-airflow-common: &airflow-common
   image: ss-exercise-airflow:custom
   environment:
     &airflow-common-env
-    # 1. FIX AUTH: Switch to FAB to use the DB user you created
-    #AIRFLOW__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
-    AIRFLOW__AUTH_MANAGER: airflow.providers.standard.auth_manager.simple.simple_auth_manager.SimpleAuthManager
+    # 1. AIRFLOW__API_AUTH__JWT_SECRET: ${JWT_SECRET} TODO
+    AIRFLOW__AUTH_MANAGER: airflow.api_fastapi.auth.managers.simple.simple_auth_manager.SimpleAuthManager
     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/config/passwords.json
-    # 2. FIX DEPRECATIONS: Move from [core] to [database]
+    AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${JWT_SECRET}
+    AIRFLOW__API_AUTH__JWT_SECRET: ${JWT_SECRET}
+    AIRFLOW__CORE__INTERNAL_API_SECRET_KEY: ${JWT_SECRET}
+
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-    # 3. FIX EXECUTOR: Set explicitly to stop FutureWarning
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-api-server:8080/execution/
-    AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    
   volumes:
     - ./dags:/opt/airflow/dags
     - ./data:/opt/airflow/data
@@ -40,7 +42,7 @@ services:
     <<: *airflow-common
     command: api-server
     ports:
-      - "8383:8080" # Access UI/API here
+      - "8383:8080"
 
   airflow-scheduler:
     <<: *airflow-common
@@ -49,6 +51,11 @@ services:
   airflow-triggerer:
     <<: *airflow-common
     command: triggerer
+
+  # MANDATORY FOR AIRFLOW 3
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
 
   airflow-init:
     <<: *airflow-common

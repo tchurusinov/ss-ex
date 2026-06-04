@@ -1,0 +1,75 @@
+
+# x-airflow-common: &airflow-common
+#   build: .
+#   image: ss-exercise-airflow:custom
+#   environment:
+#     &airflow-common-env
+#     # 1. FIX AUTH: Switch to FAB to use the DB user you created
+#     #AIRFLOW__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+#     AIRFLOW__AUTH_MANAGER: airflow.providers.standard.auth_manager.simple.simple_auth_manager.SimpleAuthManager
+#     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/config/passwords.json
+#     # 2. FIX DEPRECATIONS: Move from [core] to [database]
+#     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+#     # 3. FIX EXECUTOR: Set explicitly to stop FutureWarning
+#     AIRFLOW__CORE__EXECUTOR: LocalExecutor
+#     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-api-server:8080/execution/
+#     AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
+#     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+#     AIRFLOW__WEBSERVER__SECRET_KEY: "42F1U0GdGSQ0AaQCFRmdfA"
+#     AIRFLOW__API_AUTH__JWT_SECRET: "42F1U0GdGSQ0AaQCFRmdfA"
+#     AIRFLOW__CORE__INTERNAL_API_SECRET_KEY: "42F1U0GdGSQ0AaQCFRmdfA"
+#   volumes:
+#     - ./dags:/opt/airflow/dags
+#     - ./data:/opt/airflow/data
+#     - ./logs:/opt/airflow/logs
+#     - ./config:/opt/airflow/config
+#   user: "50000:0"
+#   depends_on:
+#     postgres:
+#       condition: service_healthy
+
+# services:
+#   postgres:
+#     image: postgres:13
+#     environment:
+#       POSTGRES_USER: airflow
+#       POSTGRES_PASSWORD: airflow
+#       POSTGRES_DB: airflow
+#     healthcheck:
+#       test: ["CMD", "pg_isready", "-U", "airflow"]
+#       interval: 10s
+#       retries: 5
+
+#   airflow-api-server:
+#     <<: *airflow-common
+#     command: api-server
+#     ports:
+#       - "8383:8080" # Access UI/API here
+
+#   airflow-scheduler:
+#     <<: *airflow-common
+#     command: scheduler
+
+#   airflow-triggerer:
+#     <<: *airflow-common
+#     command: triggerer
+
+#   airflow-init:
+#     <<: *airflow-common
+#     entrypoint: /bin/bash
+#     command:
+#       - -c
+#       - "airflow db migrate"
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
+
+#   minio:
+#     image: minio/minio
+#     command: server /data --console-address ":9001"
+#     ports:
+#       - "9000:9000"
+#       - "9001:9001"
+#     environment:
+#       MINIO_ROOT_USER: minioadmin
+#       MINIO_ROOT_PASSWORD: minioadmin

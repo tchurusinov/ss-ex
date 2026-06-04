@@ -1,32 +1,17 @@
-# todo
-
-- [x] build
-    - [x] infra
-    - [x] dag
-- [ ] run
-    - [ ] check if works as supposed
-- [ ] documentation
-    - [ ] readme
-- [ ] unit tests
-
-
-
-
-
-
 # setup
 
-docker compose down -v
-
-## environment
+## env
+set AIRFLOW_UID, AIRFLOW_GID, FERNET_KEY, JWT_SECRET in .env
 echo '{"admin": "admin"}' > ./config/passwords.json
-python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" - for fernet key
+chmod -R 777 ./config ./dags ./logs ./data
 
+
+## docker 
 docker compose build --no-cache && docker image prune -f
 
-docker compose up -d postgres
-docker compose run --rm airflow-init
-
+~~docker compose run --rm airflow-init~~
+~~docker compose down -v~~
 
 docker compose up -d
 
@@ -78,12 +63,7 @@ Unit Tests: Create tests/ folder. Use DagBag to check DAG integrity and Pytest f
 
 
 ```
-tep 1: Setup Airflow Environment
 
-    Install Airflow 3.x with Docker Compose
-    Configure DAGs directory structure
-    Set up LocalStack/MinIO for S3-compatible storage
-    Create data directories: /opt/airflow/data/raw, /opt/airflow/data/processed, /opt/airflow/data/archive, /opt/airflow/data/state
 
 Step 2: Implement PhishingGetterOperator
 
