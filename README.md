@@ -19,10 +19,13 @@ docker compose down -v
 ## environment
 echo '{"admin": "admin"}' > ./config/passwords.json
 python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
-echo  
+
+docker compose build --no-cache
+
 
 docker compose up -d postgres
 docker compose run --rm airflow-init
+
 
 docker compose up -d
 
