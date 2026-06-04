@@ -21,13 +21,15 @@ echo '{"admin": "admin"}' > ./config/passwords.json
 python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 
 docker compose build --no-cache
-
+docker image prune -f
 
 docker compose up -d postgres
 docker compose run --rm airflow-init
 
 
 docker compose up -d
+
+docker compose exec airflow-api-server cat simple_auth_manager_passwords.json.generated
 
 
 

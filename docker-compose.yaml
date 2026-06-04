@@ -6,7 +6,7 @@ x-airflow-common: &airflow-common
     # 1. FIX AUTH: Switch to FAB to use the DB user you created
     #AIRFLOW__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
     AIRFLOW__AUTH_MANAGER: airflow.providers.standard.auth_manager.simple.simple_auth_manager.SimpleAuthManager
-    AIRFLOW__AUTH_MANAGER_SIMPLE_USER_PASSWORD_FILE: /opt/airflow/config/passwords.json
+    AIRFLOW__SIMPLE_AUTH_MANAGER__PASSWORD_FILE: /opt/airflow/config/passwords.json
     # 2. FIX DEPRECATIONS: Move from [core] to [database]
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
     # 3. FIX EXECUTOR: Set explicitly to stop FutureWarning
