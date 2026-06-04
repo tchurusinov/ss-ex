@@ -20,8 +20,7 @@ docker compose down -v
 echo '{"admin": "admin"}' > ./config/passwords.json
 python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
 
-docker compose build --no-cache
-docker image prune -f
+docker compose build --no-cache && docker image prune -f
 
 docker compose up -d postgres
 docker compose run --rm airflow-init
@@ -37,7 +36,23 @@ docker compose exec airflow-api-server cat simple_auth_manager_passwords.json.ge
 
 
 
+```
+Connection Fields
 
+    Connection Id: aws_default (Standard ID tasks expect).
+    Connection Type: Select Amazon AWS from list.
+    Description: Caveman S3 mock (Optional).
+    AWS Access Key ID: minioadmin.
+    AWS Secret Access Key: minioadmin.
+
+Where is "Extra"?
+Scroll to bottom of form. Large text area named Extra exists for all AWS connections. Paste this JSON blob exactly:
+
+{
+  "endpoint_url": "http://minio:9000",
+  "region_name": "us-east-1"
+}
+```
 
 
 
