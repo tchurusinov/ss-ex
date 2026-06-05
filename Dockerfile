@@ -5,4 +5,7 @@ USER airflow
 RUN pip install --no-cache-dir \
     polars \
     apache-airflow-providers-amazon \
-    boto3
+    boto3 \
+    pytest \ 
+    pytest-mock
+    
