@@ -2,8 +2,11 @@
 
 ## env
 set AIRFLOW_UID, AIRFLOW_GID, FERNET_KEY, JWT_SECRET in .env
+
 echo '{"admin": "admin"}' > ./config/passwords.json
+
 python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" - for fernet key
+
 chmod -R 777 ./config ./dags ./logs ./data
 
 
