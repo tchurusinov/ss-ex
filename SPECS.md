@@ -163,5 +163,84 @@ Scroll to bottom of form. Large text area named Extra exists for all AWS connect
 }
 ```
 
+```
 
+# x-airflow-common: &airflow-common
+#   build: .
+#   image: ss-exercise-airflow:custom
+#   environment:
+#     &airflow-common-env
+#     # 1. AIRFLOW__API_AUTH__JWT_SECRET: ${JWT_SECRET} TODO
+#     AIRFLOW__AUTH_MANAGER: airflow.api_fastapi.auth.managers.simple.simple_auth_manager.SimpleAuthManager
+#     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/config/passwords.json
+#     AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY}
+#     AIRFLOW__WEBSERVER__SECRET_KEY: ${JWT_SECRET}
+#     AIRFLOW__API_AUTH__JWT_SECRET: ${JWT_SECRET}
+#     AIRFLOW__CORE__INTERNAL_API_SECRET_KEY: ${JWT_SECRET}
+
+#     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+#     AIRFLOW__CORE__EXECUTOR: LocalExecutor
+#     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-api-server:8080/execution/
+#     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    
+#   volumes:
+#     - ./dags:/opt/airflow/dags
+#     - ./data:/opt/airflow/data
+#     - ./logs:/opt/airflow/logs
+#     - ./config:/opt/airflow/config
+#   user: "50000:0"
+#   depends_on:
+#     postgres:
+#       condition: service_healthy
+
+# services:
+#   postgres:
+#     image: postgres:13
+#     environment:
+#       POSTGRES_USER: airflow
+#       POSTGRES_PASSWORD: airflow
+#       POSTGRES_DB: airflow
+#     healthcheck:
+#       test: ["CMD", "pg_isready", "-U", "airflow"]
+#       interval: 10s
+#       retries: 5
+
+#   airflow-api-server:
+#     <<: *airflow-common
+#     command: api-server
+#     ports:
+#       - "8383:8080"
+
+#   airflow-scheduler:
+#     <<: *airflow-common
+#     command: scheduler
+
+#   airflow-triggerer:
+#     <<: *airflow-common
+#     command: triggerer
+
+#   # MANDATORY FOR AIRFLOW 3
+#   airflow-dag-processor:
+#     <<: *airflow-common
+#     command: dag-processor
+
+#   airflow-init:
+#     <<: *airflow-common
+#     entrypoint: /bin/bash
+#     command:
+#       - -c
+#       - "airflow db migrate"
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
+
+#   minio:
+#     image: minio/minio
+#     command: server /data --console-address ":9001"
+#     ports:
+#       - "9000:9000"
+#       - "9001:9001"
+#     environment:
+#       MINIO_ROOT_USER: minioadmin
+#       MINIO_ROOT_PASSWORD: minioadmin
 ```
