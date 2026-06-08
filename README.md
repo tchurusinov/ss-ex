@@ -69,7 +69,8 @@ docker compose up -d
 ### Unit Tests
 Run the `pytest` suite inside the scheduler container:
 ```bash
-docker compose exec airflow-scheduler pytest tests/test_phishing_pipeline.py
+docker compose exec airflow-scheduler pytest tests/test_phishing_pipeline_v3.py
+docker compose exec -e PYTHONPATH=/opt/airflow airflow-scheduler pytest tests/test_phishing_pipeline_v4.py
 ```
 
 ### Forensic Inspection
