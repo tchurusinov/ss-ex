@@ -8,8 +8,7 @@ from airflow.exceptions import AirflowSkipException
 # Requirements: Unit tests cover parsing, transform, and failures [5]
 from dags.phishing_pipeline_v3 import (
     PhishingGetterOperator, 
-    S3PublisherOperator,
-    verify_changed
+    S3PublisherOperator
 )
 
 @pytest.fixture
